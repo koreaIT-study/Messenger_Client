@@ -360,7 +360,42 @@ function isMyMessage(message) {
 }
 
 function downFile(){
-
+    let options = {
+        url: "/download"
+        , beforeSubmit  : loadingAjaxImage
+        , contentType: "application/x-www-form-urlencoded;charset=UTF-8"
+        , xhr: function () {
+            let xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function () {
+                //response 데이터를 바이너리로 처리한다. 세팅하지 않으면 default가 text
+                xhr.responseType = "blob";
+            };
+            return xhr;
+        }
+        , type: "post"
+        , success: function (data, message, xhr) {
+            hideAjaxImage();
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                // 성공했을때만 파일 다운로드 처리하고
+                let disposition = xhr.getResponseHeader('Content-Disposition');
+                let filename;
+                if (disposition && disposition.indexOf('attachment') !== -1) {
+                    let filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+                    let matches = filenameRegex.exec(disposition);
+                    if (matches != null && matches[1]) filename = matches[1].replace(/['"]/g, '');
+                }
+                let blob = new Blob([data]);
+                let link = document.createElement('a');
+                link.href = window.URL.createObjectURL(blob);
+                link.download = filename;
+                link.click();
+            }else{
+                //실패했을때는 alert 메시지 출력
+                alertPopup("다운로드에 실패하였습니다.");
+            }
+        }
+    };
+    $("#testForm").ajaxSubmit( options );
 }
 
 function getHtmlMsgTag(msg){
