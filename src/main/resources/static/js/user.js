@@ -46,10 +46,10 @@ function checkAuthNumber() {
 
 
 function signUp() {
-/*	if (!SignUp.vaildate) {
-		alert('인증 번호를 확인해 주세요.');
-		return;
-	}*/
+	/*	if (!SignUp.vaildate) {
+			alert('인증 번호를 확인해 주세요.');
+			return;
+		}*/
 
 	const name = document.querySelector('#name').value;
 	const email = document.querySelector('#email').value;
@@ -70,23 +70,23 @@ function signUp() {
 	formData.append('email', email);
 	formData.append('pwd', password);
 	formData.append('file', file)
-	
-	 $.ajax({
-        url : "/signUp",
-        type : `POST`,
-        processData : false,
-        contentType : false,
-        data : formData,
-        success : (response) => {
-            alert('회원가입이 완료되었습니다.');
-            location.href='/';
-        },
-        error : (err) => {
-            console.log(err.responseText);
-        }
-    })
-	
-	
+
+	$.ajax({
+		url: "/signUp",
+		type: `POST`,
+		processData: false,
+		contentType: false,
+		data: formData,
+		success: (response) => {
+			alert('회원가입이 완료되었습니다.');
+			location.href = '/';
+		},
+		error: (err) => {
+			console.log(err.responseText);
+		}
+	})
+
+
 }
 
 function uploadImage() {

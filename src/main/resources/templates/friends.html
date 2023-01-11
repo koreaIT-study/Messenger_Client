@@ -36,6 +36,12 @@
 			</div>
 			<input type="hidden" th:value="${userId}" id="myId">
             <input type="hidden" th:value="${userName}" id="myName">
+			<th:block th:if="${profileImg != null}">
+				<input type="hidden" th:value="${profileImg}" id="myProfile">
+			</th:block>
+			<th:block th:unless="${profileImg != null}">
+				<input type="hidden" value="img/anonymous_profile.png" id="myProfile">
+			</th:block>
 		</div>
 		<!-- 친구목록  -->
 		<div id="friend_list">
@@ -65,15 +71,14 @@
 			<div id="chat_header">
 				<div>
 					<div id="chat_icon">
-						<img src="img/anonymous_profile.png" alt="">
+						<img src="img/anonymous_profile.png" alt="" id="header_profile">
 					</div>
 					<div class="chat_title">
 						<div>정치/사회/경제부</div>
 						<div>멤버 40</div>
 					</div>
 					<div class="chat_set_wrap">
-						<img src="img/setting.png" class="set-img"
-							onclick="showSetSelect(event)">
+						<img src="img/setting.png" class="set-img" onclick="showSetSelect(event)">
 						<div class="div_select_wrap hidden">
 							<div class="div_select" onclick="chatRoomHide();">채팅방 닫기</div>
 							<div class="div_select">

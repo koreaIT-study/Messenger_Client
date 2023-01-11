@@ -1,9 +1,15 @@
 package com.teamride.messenger.client.controller;
 
 import javax.annotation.Resource;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import ch.qos.logback.core.util.FileUtil;
 import com.teamride.messenger.client.config.Constants;
+import org.apache.tomcat.util.http.fileupload.FileUtils;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -14,13 +20,11 @@ import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.concurrent.ListenableFuture;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.teamride.messenger.client.config.KafkaConstants;
 import com.teamride.messenger.client.dto.ChatMessageDTO;
@@ -37,6 +41,12 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.file.FileSystem;
+import java.nio.file.Files;
 import java.util.List;
 
 @EnableAsync
@@ -134,5 +144,26 @@ public class StompChatController {
                 .block();
         log.info("왔나요~~~");
         return ResponseEntity.ok(successCnt);
+    }
+
+    @PostMapping(value = "/downFile", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public void downFile(@RequestBody ChatMessageDTO msg, HttpServletResponse rsp){
+        File file = new File("C:\\Users\\minja\\Desktop\\koreaITMessenger\\messenger_client\\src\\main\\resources\\static\\img\\loading.gif");
+        try (ServletOutputStream outputStream = rsp.getOutputStream();
+             BufferedInputStream in = new BufferedInputStream(new FileInputStream(file))){
+
+            String mimeType = "application/octet-stream";
+            rsp.setContentType(mimeType);
+            rsp.setContentLengthLong(file.length());
+            rsp.setHeader("Content-Disposition","arrachment;filename=" + file.getName());
+
+//            byte[] buffer = new byte[4096];
+//            int byteRead = -1;
+            FileCopyUtils.copy(in, outputStream);
+            outputStream.flush();
+            log.info(":::::: 일단 여기까지는 돌았음!! ::::::");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

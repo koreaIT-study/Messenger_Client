@@ -88,6 +88,7 @@ public class UserController {
         ModelAndView mv = new ModelAndView("friends");
         mv.addObject(Constants.LOGIN_SESSION, httpSession.getAttribute(Constants.LOGIN_SESSION));
         mv.addObject(Constants.LOGIN_SESSION_NAME, httpSession.getAttribute(Constants.LOGIN_SESSION_NAME));
+        mv.addObject(Constants.LOGIN_SESSION_PROFILE, httpSession.getAttribute(Constants.LOGIN_SESSION_PROFILE));
         return mv;
     }
 
@@ -115,6 +116,7 @@ public class UserController {
 
             httpSession.setAttribute(Constants.LOGIN_SESSION, resp.getId());
             httpSession.setAttribute(Constants.LOGIN_SESSION_NAME, resp.getName());
+            httpSession.setAttribute(Constants.LOGIN_SESSION_PROFILE, resp.getProfileImg());
             return new RestResponse(resp);
         } catch (Exception e) {
             return new RestResponse(1, e.getLocalizedMessage(), null);

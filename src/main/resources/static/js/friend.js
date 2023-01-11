@@ -93,22 +93,17 @@ const sendMessage = () => {
 		roomId: header.dataset.rid,
 		writer: $('#myId').val(),
 		message: $textArea.val(),
-		writerName: $('#myName').val()
+		writerName: $('#myName').val(),
+        profileImg : $('#myProfile').val()
 	};
 	console.log("메시지 보냄", $textArea.val())
 	$textArea.val('');
 	stomp.send("/pub/chat/message", {}, JSON.stringify(param));
 }
 window.onload = function() {
-
-
 	document.getElementById('friendListBtn').click();
 	getFriendList();
 	getRoomList();
-
-
-	//	let sockJs = new SockJS("/stomp/chat");
-	//	let stomp = Stomp.over(sockJs);
 
 	const userId = $('#myId').val();
 	// 채팅방 목록 관리
@@ -119,8 +114,6 @@ window.onload = function() {
 		})
 	})
 
-
-	//	ondblclick='connect(this);'
 	// message 보내기
 	$("#chat_writer").on("keyup", (e) => {
 		let header = document.getElementById('chat_header');
@@ -146,7 +139,6 @@ window.onload = function() {
 		}
 		sendMessage();
 	})
-
 
 	let searchInput = document.getElementById('searchText');
 	searchInput.addEventListener('keyup', (e) => {
@@ -256,9 +248,9 @@ function searchRoomInfo(roomId) {
 	// roomId로 채팅방 정보를 찾아주는 method
 	jsParamAjaxCall('GET', '/chat/room?roomId=' + roomId, {}, function(response) {
 		let title = $('.chat_title').children();
-		console.log(response)
 		title[0].innerHTML = response.roomName;
 		title[1].innerHTML = "멤버 " + response.cnt;
+		$('#header_profile').attr('src', `${profilePath}/${response.roomImagePath}`);
 	});
 }
 
@@ -278,6 +270,8 @@ function getMessages(roomId, time) {
 		let messageHtml = "";
 
 		let html = "";
+
+		console.log("response", response)
 
 		for (let i = 0; i < messages.length; i++) {
 			if (i != 0 && messages[i - 1].writer != messages[i].writer) {
@@ -322,7 +316,7 @@ function getMessages(roomId, time) {
 // message를 subscribe해서 view에 뿌려주는 method
 function subMessage(message) {
 
-
+	console.log("message", message)
 	let wrap = document.getElementById('chat_msg_template');
 	let lastChildDiv = wrap.lastChild;
 
@@ -359,60 +353,43 @@ function isMyMessage(message) {
 	return false;
 }
 
-function downFile(){
-    let options = {
-        url: "/download"
-        , beforeSubmit  : loadingAjaxImage
-        , contentType: "application/x-www-form-urlencoded;charset=UTF-8"
-        , xhr: function () {
-            let xhr = new XMLHttpRequest();
-            xhr.onreadystatechange = function () {
-                //response 데이터를 바이너리로 처리한다. 세팅하지 않으면 default가 text
-                xhr.responseType = "blob";
-            };
-            return xhr;
-        }
-        , type: "post"
-        , success: function (data, message, xhr) {
-            hideAjaxImage();
-            if (xhr.readyState == 4 && xhr.status == 200) {
-                // 성공했을때만 파일 다운로드 처리하고
-                let disposition = xhr.getResponseHeader('Content-Disposition');
-                let filename;
-                if (disposition && disposition.indexOf('attachment') !== -1) {
-                    let filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
-                    let matches = filenameRegex.exec(disposition);
-                    if (matches != null && matches[1]) filename = matches[1].replace(/['"]/g, '');
-                }
-                let blob = new Blob([data]);
-                let link = document.createElement('a');
-                link.href = window.URL.createObjectURL(blob);
-                link.download = filename;
-                link.click();
-            }else{
-                //실패했을때는 alert 메시지 출력
-                alertPopup("다운로드에 실패하였습니다.");
-            }
-        }
-    };
-    $("#testForm").ajaxSubmit( options );
+function downFile(e){
+	let roomId = document.getElementById('chat_header').dataset.rid;
+
+	$.ajax({
+		url: "/downFile",
+		method: "post",
+		data: JSON.stringify({
+			roomId : document.getElementById('chat_header').dataset.rid,
+			messege : e.target.src.substring(e.target.src.lastIndexOf('/') + 1)
+		}),
+		contentType: "application/json",
+		dataType: "application/x-www-form-urlencode",
+		success: function (response) {
+			console.log('성공');
+			console.log(response);
+		},
+		error: function (xhr, status, error) {
+			alert(xhr.status + " : 서버와의 통신이 원활하지 않습니다. 다시 시도해 주십시오.");
+		}
+	});
 }
 
-function getHtmlMsgTag(msg){
+function getHtmlMsgTag(msg) {
 	let ext = msg.extension;
-    let htmlTag = ``;
-    if(['.img', '.jpg', '.png', '.jpeg','.gif'].includes(ext)){
-        htmlTag = `<img src="${msgFilePath + "/" +msg.roomId + "/" + msg.message}" onclick="downFile();" class="img_file">`
-    }else if (ext){
-        htmlTag = `<div class="txt_file" onclick="downFile();"><img src="img/txtFile.png"><span>${msg.message.substr(msg.message.lastIndexOf('||'))}</span></div>`
-    }else{
-        htmlTag = msg.message.replaceAll("\n", `<br>`)
-    }
-    return htmlTag;
+	let htmlTag = ``;
+	if (['.img', '.jpg', '.png', '.jpeg', '.gif'].includes(ext)) {
+		htmlTag = `<img src="${msgFilePath + "/" + msg.roomId + "/" + msg.message}" onclick="downFile(event);" class="img_file">`
+	} else if (ext) {
+		htmlTag = `<div class="txt_file" onclick="downFile(event);"><img src="img/txtFile.png"><span>${msg.message.substr(msg.message.lastIndexOf('||'))}</span></div>`
+	} else {
+		htmlTag = msg.message.replaceAll("\n", `<br>`)
+	}
+	return htmlTag;
 }
 
 function myMessage(msg) {
-    let htmlMsgTag = getHtmlMsgTag(msg);
+	let htmlMsgTag = getHtmlMsgTag(msg);
 	let myMessage = "<div class='my_chat_flexable'>";
 	myMessage += `<span class='write_date' data-wdate='${msg.timestamp}'>`;
 	myMessage += `${msg.timestamp.split('.')[0].split(' ')[1]}</span>`;
@@ -430,7 +407,7 @@ function myMessageTemplate(messages, message) {
 }
 
 function otherMessage(msg) {
-    let htmlMsgTag = getHtmlMsgTag(msg);
+	let htmlMsgTag = getHtmlMsgTag(msg);
 	let otherMessage = "<div class='chat_msg_flexable'>";
 	otherMessage += `<div class='chat_msg'>${htmlMsgTag}</div>`;
 	otherMessage += `<span class='write_date' data-wdate='${msg.timestamp}'>`;
@@ -440,9 +417,11 @@ function otherMessage(msg) {
 }
 
 function otherMessageTemplate(messages, message) {
+	let profileImg = message.profileImg != null ? `${profilePath}/${message.profileImg}` : "img/anonymous_profile.png";
+
 	let otherTemplate = "<div class='chat_person_wrap' data-uid='" + message.writer + "'>";
 	otherTemplate += "<div class='chat_person_profile'>";
-	otherTemplate += "<img src='img/anonymous_profile.png'></div>";
+	otherTemplate += `<img src=${profileImg} style="width:50px; height:50px;"></div>`;
 	otherTemplate += "<div class='chat_person'><div class='chat_person_name'>";
 	otherTemplate += message.writerName + "</div>";
 	otherTemplate += messages;
