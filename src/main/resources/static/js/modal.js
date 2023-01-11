@@ -29,13 +29,13 @@ function searchUser(e) {
 				const errno = response.errno;
 				if (errno === 0) {
 					const data = response.data;
-
+					console.log(response)
 					let friendListHtml = "";
 					let i = 0;
 					data.forEach((el) => {
 						friendListHtml += "<li friendId='" + data[i].id + "' email='" + (data[i].email ?? "") + "'ondblclick='addFriend(this);'>";
 						friendListHtml += "<div class='friend-box'>";
-						friendListHtml += "<div class='friend-profil'></div>";
+						friendListHtml += `<div class='friend-profil' style = 'background: url(${profilePath}/${data[i].profileImg});    background-repeat: round;'></div>`;
 						friendListHtml += "<div class='friend-title'>" + data[i].name + "</div>";
 						friendListHtml += `<div class='friend-msg'>${data[i].email}</div>`;
 						friendListHtml += "</div>";
