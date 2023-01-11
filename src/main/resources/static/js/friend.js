@@ -249,7 +249,8 @@ function searchRoomInfo(roomId) {
 		let title = $('.chat_title').children();
 		title[0].innerHTML = response.roomName;
 		title[1].innerHTML = "멤버 " + response.cnt;
-		$('#header_profile').attr('src', `${profilePath}/${response.roomImagePath}`);
+		if(response.roomImagePath != null)
+			$('#header_profile').attr('src', `${profilePath}/${response.roomImagePath}`);
 	});
 }
 
