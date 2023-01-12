@@ -370,9 +370,11 @@ function getHtmlMsgTag(msg) {
 	let ext = msg.extension;
 	let htmlTag = ``;
 	if (['.img', '.jpg', '.png', '.jpeg', '.gif'].includes(ext)) {
+		console.log(msg)
 		htmlTag = `<img src="${msgFilePath + "/" + msg.roomId + "/" + msg.message}" onclick="downFile(event);" class="img_file">`
 	} else if (ext) {
-		htmlTag = `<div class="txt_file" onclick="downFile(event);"><img src="img/txtFile.png"><span>${msg.message.substr(msg.message.lastIndexOf('||'))}</span></div>`
+		let splitMsg = msg.message.split('||');
+		htmlTag = `<div class="txt_file" onclick="downFile(event);"><img src="img/txtFile.png" style='width:100px;'><span>${splitMsg[splitMsg.length-1]}</span></div>`
 	} else {
 		htmlTag = msg.message.replaceAll("\n", `<br>`)
 	}

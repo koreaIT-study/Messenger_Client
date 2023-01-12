@@ -200,7 +200,7 @@ ul {
 	display: inline-block;
 }
 
-.ellips{
+.ellips {
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	overflow: hidden;
