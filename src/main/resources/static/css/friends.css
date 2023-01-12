@@ -199,3 +199,9 @@ ul {
 	left: 163px;
 	display: inline-block;
 }
+
+.ellips{
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
+}

@@ -356,24 +356,14 @@ function isMyMessage(message) {
 
 function downFile(e){
 	let roomId = document.getElementById('chat_header').dataset.rid;
-
-	$.ajax({
-		url: "/downFile",
-		method: "post",
-		data: JSON.stringify({
-			roomId : document.getElementById('chat_header').dataset.rid,
-			messege : e.target.src.substring(e.target.src.lastIndexOf('/') + 1)
-		}),
-		contentType: "application/json",
-		dataType: "application/x-www-form-urlencode",
-		success: function (response) {
-			console.log('성공');
-			console.log(response);
-		},
-		error: function (xhr, status, error) {
-			alert(xhr.status + " : 서버와의 통신이 원활하지 않습니다. 다시 시도해 주십시오.");
-		}
-	});
+	let msg = e.target.src.substring(e.target.src.lastIndexOf('/') + 1);
+	let a = document.createElement('a');
+	a.id = 'fileDowmA';
+	a.hidden = true;
+	a.href = `/downFile/${roomId}/${msg}`;
+	document.body.appendChild(a);
+	a.click();
+	a.remove();
 }
 
 function getHtmlMsgTag(msg) {
@@ -419,7 +409,7 @@ function otherMessage(msg) {
 
 function otherMessageTemplate(messages, message) {
 	let profileImg = message.profileImg != null ? `${profilePath}/${message.profileImg}` : "img/anonymous_profile.png";
-
+	console.log(message);
 	let otherTemplate = "<div class='chat_person_wrap' data-uid='" + message.writer + "'>";
 	otherTemplate += "<div class='chat_person_profile'>";
 	otherTemplate += `<img src=${profileImg} style="width:50px; height:50px;"></div>`;

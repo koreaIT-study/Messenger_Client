@@ -89,6 +89,10 @@
 	margin-right: 5px;
 	word-break: break-all;
 }
+.chat_msg img{
+	max-width: 375px;
+	max-height: 375px;
+}
 
 .my_chat_wrapper {
 	text-align: right;
