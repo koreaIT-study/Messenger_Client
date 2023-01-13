@@ -252,6 +252,9 @@ function searchRoomInfo(roomId) {
 		title[1].innerHTML = "멤버 " + response.cnt;
 		if (response.roomImagePath != null)
 			$('#header_profile').attr('src', `${profilePath}/${response.roomImagePath}`);
+		else {
+			$('#header_profile').attr('src', `img/anonymous_profile.png`);
+		}
 	});
 }
 
