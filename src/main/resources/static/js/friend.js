@@ -354,11 +354,11 @@ function isMyMessage(message) {
 	return false;
 }
 
-function downFile(e){
+function downFile(e) {
 	let roomId = document.getElementById('chat_header').dataset.rid;
-	let msg = e.target.src.substring(e.target.src.lastIndexOf('/') + 1);
+	let msg = e.target.dataset.svfnm;
+
 	let a = document.createElement('a');
-	a.id = 'fileDowmA';
 	a.hidden = true;
 	a.href = `/downFile/${roomId}/${msg}`;
 	document.body.appendChild(a);
@@ -371,10 +371,10 @@ function getHtmlMsgTag(msg) {
 	let htmlTag = ``;
 	if (['.img', '.jpg', '.png', '.jpeg', '.gif'].includes(ext)) {
 		console.log(msg)
-		htmlTag = `<img src="${msgFilePath + "/" + msg.roomId + "/" + msg.message}" onclick="downFile(event);" class="img_file">`
+		htmlTag = `<img src="${msgFilePath + "/" + msg.roomId + "/" + msg.message}" onclick="downFile(event);" class="img_file" data-svFnm="${msg.message}">`
 	} else if (ext) {
 		let splitMsg = msg.message.split('||');
-		htmlTag = `<div class="txt_file" onclick="downFile(event);"><img src="img/txtFile.png" style='width:100px;'><span>${splitMsg[splitMsg.length-1]}</span></div>`
+		htmlTag = `<div class="txt_file" onclick="downFile(event);" data-svFnm="${msg.message}"><img src="img/txtFile.png" style='width:100px;'><span>${splitMsg[splitMsg.length-1]}</span></div>`
 	} else {
 		htmlTag = msg.message.replaceAll("\n", `<br>`)
 	}

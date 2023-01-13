@@ -133,7 +133,7 @@ public class StompChatController {
     @GetMapping(value = "/downFile/{roomId}/{msg}")
     public ResponseEntity<?> downFile(@PathVariable String roomId, @PathVariable String msg){
         String uri = "/downFile/" + roomId + "/" + msg;
-        String fileName = msg.substring(msg.lastIndexOf("||") + 2);
+        String fileName = msg.substring(msg.lastIndexOf("|") + 1);
 
         org.springframework.core.io.Resource rsp = WebClient.builder().baseUrl(Constants.FILE_SERVER_URL)
                 .codecs(cfg -> cfg.defaultCodecs().maxInMemorySize(10 * 1024 * 1024))
