@@ -94,7 +94,7 @@ const sendMessage = () => {
 		writer: $('#myId').val(),
 		message: $textArea.val(),
 		writerName: $('#myName').val(),
-        profileImg : $('#myProfile').val()
+		profileImg: $('#myProfile').val()
 	};
 	console.log("메시지 보냄", $textArea.val())
 	$textArea.val('');
@@ -250,8 +250,11 @@ function searchRoomInfo(roomId) {
 		let title = $('.chat_title').children();
 		title[0].innerHTML = response.roomName;
 		title[1].innerHTML = "멤버 " + response.cnt;
-		if(response.roomImagePath != null)
+		if (response.roomImagePath != null)
 			$('#header_profile').attr('src', `${profilePath}/${response.roomImagePath}`);
+		else {
+			$('#header_profile').attr('src', `img/anonymous_profile.png`);
+		}
 	});
 }
 
