@@ -94,7 +94,7 @@ const sendMessage = () => {
 		writer: $('#myId').val(),
 		message: $textArea.val(),
 		writerName: $('#myName').val(),
-        profileImg : $('#myProfile').val()
+		profileImg: $('#myProfile').val()
 	};
 	console.log("메시지 보냄", $textArea.val())
 	$textArea.val('');
@@ -250,7 +250,7 @@ function searchRoomInfo(roomId) {
 		let title = $('.chat_title').children();
 		title[0].innerHTML = response.roomName;
 		title[1].innerHTML = "멤버 " + response.cnt;
-		if(response.roomImagePath != null)
+		if (response.roomImagePath != null)
 			$('#header_profile').attr('src', `${profilePath}/${response.roomImagePath}`);
 	});
 }
@@ -354,11 +354,16 @@ function isMyMessage(message) {
 	return false;
 }
 
-function downFile(e){
+function downFile(e) {
 	let roomId = document.getElementById('chat_header').dataset.rid;
-	let msg = e.target.src.substring(e.target.src.lastIndexOf('/') + 1);
+	let msg = "";
+	if ($(e.target).parent().text() == '') {
+		msg = e.target.src.substring(e.target.src.lastIndexOf('/') + 1);
+	} else {
+		msg = $(e.target).parent().text();
+	}
+
 	let a = document.createElement('a');
-	a.id = 'fileDowmA';
 	a.hidden = true;
 	a.href = `/downFile/${roomId}/${msg}`;
 	document.body.appendChild(a);
@@ -374,7 +379,7 @@ function getHtmlMsgTag(msg) {
 		htmlTag = `<img src="${msgFilePath + "/" + msg.roomId + "/" + msg.message}" onclick="downFile(event);" class="img_file">`
 	} else if (ext) {
 		let splitMsg = msg.message.split('||');
-		htmlTag = `<div class="txt_file" onclick="downFile(event);"><img src="img/txtFile.png" style='width:100px;'><span>${splitMsg[splitMsg.length-1]}</span></div>`
+		htmlTag = `<div class="txt_file" onclick="downFile(event);"><img src="img/txtFile.png" style='width:100px;'><span>${splitMsg[splitMsg.length - 1]}</span></div>`
 	} else {
 		htmlTag = msg.message.replaceAll("\n", `<br>`)
 	}
