@@ -1,24 +1,16 @@
 package com.teamride.messenger.client.controller;
 
 import javax.annotation.Resource;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import ch.qos.logback.core.util.FileUtil;
 import com.teamride.messenger.client.config.Constants;
-import org.apache.tomcat.util.http.fileupload.FileUtils;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.*;
-import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.util.FileCopyUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.concurrent.ListenableFuture;
@@ -39,14 +31,6 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.nio.file.FileSystem;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 @EnableAsync
@@ -148,28 +132,23 @@ public class StompChatController {
 
     @GetMapping(value = "/downFile/{roomId}/{msg}")
     public ResponseEntity<?> downFile(@PathVariable String roomId, @PathVariable String msg){
-        log.info("emf");
         String uri = "/downFile/" + roomId + "/" + msg;
-        String fileNmae = msg.substring(msg.lastIndexOf("||"));
+        String fileName = msg.substring(msg.lastIndexOf("||") + 2);
 
-        MultiValueMap<String, Object> rsp = WebClient.builder().baseUrl(Constants.FILE_SERVER_URL)
+        org.springframework.core.io.Resource rsp = WebClient.builder().baseUrl(Constants.FILE_SERVER_URL)
+                .codecs(cfg -> cfg.defaultCodecs().maxInMemorySize(10 * 1024 * 1024))
                 .build()
                 .get()
                 .uri(uri)
-                .accept(MediaType.MULTIPART_FORM_DATA)
+                .accept(MediaType.APPLICATION_OCTET_STREAM)
                 .retrieve()
                 .onStatus(HttpStatus::is4xxClientError, e -> Mono.error(new HttpClientErrorException(e.statusCode())))
                 .onStatus(HttpStatus::is5xxServerError, e -> Mono.error(new HttpServerErrorException(e.statusCode())))
-                .bodyToMono(MultiValueMap.class)
+                .bodyToMono(org.springframework.core.io.Resource.class)
                 .block();
 
-        org.springframework.core.io.Resource resource = ((MultipartFile)rsp.get("file")).getResource();
-
-        HttpHeaders headers = new HttpHeaders();
-        // 다운로드 되거나 로컬에 저장되는 용도로 쓰이는지를 알려주는 헤더
-        headers.setContentDisposition(ContentDisposition.builder("attachment").filename(fileNmae).build());
-
-        log.info(":::::: 일단 여기까지는 돌았음!! ::::::");
-        return new ResponseEntity<Object>(resource, headers, HttpStatus.OK);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=" + fileName)
+                .body(rsp);
     }
 }

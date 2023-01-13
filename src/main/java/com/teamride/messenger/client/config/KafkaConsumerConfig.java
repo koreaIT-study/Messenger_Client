@@ -51,7 +51,7 @@ public class KafkaConsumerConfig {
 	public ConcurrentKafkaListenerContainerFactory<String, ChatMessageDTO> kafkaListenerContainerFactory() {
 		ConcurrentKafkaListenerContainerFactory<String, ChatMessageDTO> factory = new ConcurrentKafkaListenerContainerFactory<>();
 		factory.setConsumerFactory(consumerFactory());
-		factory.setConcurrency(3);  // 컨슈머의 개수
+		factory.setConcurrency(100);  // 컨슈머의 개수
 		// default commit 5초 , sync commit
 		log.info("default ack mode(batch): {}", factory.getContainerProperties().getAckMode());
 		factory.getContainerProperties().setAckMode(AckMode.MANUAL_IMMEDIATE); // offset 수동 커밋을 위함
