@@ -43,10 +43,10 @@ spring:
 messenger:
   kakao:
     rest_api_key: dd0b678881f8ea6c47e2012b37fb8c90
-    redirect_url: http://localhost:8081/oauth
+    redirect_url: http://34.64.230.153:8081/oauth
   naver:
     rest_api_key: uSS2XZqtURcJU2R6feyR
-    redirect_url: http://localhost:8081/api/naver/oauth
+    redirect_url: http://34.64.230.153:8081/api/naver/oauth
     client_secret: vKSB1WVm2g
 logging:
   logback:
