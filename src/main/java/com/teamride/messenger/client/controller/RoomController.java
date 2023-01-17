@@ -63,7 +63,7 @@ public class RoomController {
         }
         builder.part("roomId", roomId);
 
-        Integer saveCnt = WebClient.builder()
+        String fileName = WebClient.builder()
             .baseUrl(Constants.FILE_SERVER_URL)
             .build()
             .post()
@@ -74,9 +74,9 @@ public class RoomController {
             .retrieve()
             .onStatus(HttpStatus::is4xxClientError, e -> Mono.error(new HttpClientErrorException(e.statusCode())))
             .onStatus(HttpStatus::is5xxServerError, e -> Mono.error(new HttpServerErrorException(e.statusCode())))
-            .bodyToMono(Integer.class)
+            .bodyToMono(String.class)
             .block();
 
-        return ResponseEntity.ok(saveCnt);
+        return ResponseEntity.ok(fileName);
     }
 }

@@ -19,7 +19,7 @@ function getFriendList() {
 				friendListHtml += "<li id='" + friendList[i].friendId + "' data-rid='" + (friendList[i].roomId ?? '') + "' data-uid='" + friendList[i].friendId + "' data-group='N' >"
 				friendListHtml += "<div class='friend-box'>"
 				if (!friendList[i].profileImg) {
-					friendListHtml += `<div class='friend-profil'></div>`;
+					friendListHtml += `<div class='friend-profil' style='background: url(img/anonymous_profile.png)'></div>`;
 				} else {
 					friendListHtml += `<div class='friend-profil' 
 					style = 'background: url(${profilePath}/${friendList[i].profileImg}); 
@@ -53,7 +53,7 @@ function getRoomList() {
 			roomListHtml += `<li data-rId=${response[i].roomId} ondblclick="connect(this)">`;
 			roomListHtml += '<div class="friend-box">';
 			if (!response[i].roomImagePath) {
-				roomListHtml += `<div class='friend-profil'></div>`;
+				roomListHtml += `<div class='friend-profil' style='background: url(img/anonymous_profile.png)'></div>`;
 			} else {
 				roomListHtml += `<div class='friend-profil' 
 					style = 'background: url(${profilePath}/${response[i].roomImagePath}); 
@@ -494,7 +494,7 @@ function updateChatRoom(msg) {
 		let roomHtml = "";
 		roomHtml += `<li data-rId=${msg.roomId} ondblclick="connect(this)">`;
 		roomHtml += '<div class="friend-box">';
-		roomHtml += '<div class="friend-profil"></div>';
+		roomHtml += `<div class='friend-profil' style='background: url(img/anonymous_profile.png)'></div>`
 		roomHtml += '<div class="friend-title">';
 		roomHtml += msg.roomName + '<span class="chatRoomLi">' + msg.cnt + '</span>';
 		roomHtml += '<span class="chatRoomLi right time">' + msg.timestamp.split('.')[0] + '</span></div>';
@@ -546,10 +546,6 @@ function search(event) {
 }
 
 
-function chatRoomOut() {
-
-}
-
 /* scroll 맨위로 올릴 때 메시지 100개씩 뿌려주기 */
 function getLastMessage() {
 	let nowScrollPosition = document.getElementById('chat_msg_template').scrollTop;
@@ -591,6 +587,8 @@ function changeChatRoomProfile() {
 		data: formData,
 		success: (response) => {
 			console.log("response", response);
+			
+			$('#header_profile').attr('src', `${profilePath}/${response.split("/")[response.length-1]}`);
 			getRoomList();
 
 		},
