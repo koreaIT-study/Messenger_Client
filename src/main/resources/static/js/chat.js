@@ -12,6 +12,8 @@ function sendFile(){
         form.append('files', file);
     }
     form.append('writer', document.getElementById('myId').value);
+    form.append('writerName', $('#myName').val());
+    form.append('profileImg', $('#myProfile').val());
     form.append('roomId', document.getElementById('chat_header').dataset.rid);
 
     $.ajax({
